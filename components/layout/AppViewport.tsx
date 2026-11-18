@@ -12,7 +12,7 @@ const designHeight = 900;
 const chromePaths = new Set(["/", "/friends", "/saju", "/compatibility", "/charge", "/my", "/today"]);
 
 export default function AppViewport({ children }: { children: ReactNode }) {
-  const pathname = usePathname();
+  const pathname = usePathname().replace(/\/$/, "") || "/";
   const [desktopScale, setDesktopScale] = useState<number | null>(null);
   const isUnframed = unframedPrefixes.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)

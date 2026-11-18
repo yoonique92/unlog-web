@@ -65,25 +65,28 @@ export default function SajuOnboardingPage() {
         gender,
       };
 
-      const response = await fetch("/api/users/saju", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(profile),
-      });
+      if (process.env.NEXT_PUBLIC_UNLOG_PAGES !== "true") {
+        const response = await fetch("/api/users/saju", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(profile),
+        });
 
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data?.error || "사주 정보를 저장하지 못했습니다.");
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data?.error || "사주 정보를 저장하지 못했습니다.");
+        }
+
+        const account = JSON.parse(localStorage.getItem("unlog-account") ?? "null");
+        localStorage.setItem(
+          "unlog-account",
+          JSON.stringify({ ...account, name: profile.name })
+        );
       }
 
-      const account = JSON.parse(localStorage.getItem("unlog-account") ?? "null");
-      localStorage.setItem(
-        "unlog-account",
-        JSON.stringify({ ...account, name: profile.name })
-      );
       localStorage.setItem("unlog-user", JSON.stringify(profile));
       router.replace("/");
-      router.refresh();
+      if (process.env.NEXT_PUBLIC_UNLOG_PAGES !== "true") router.refresh();
     } catch (error) {
       console.error("가입 사주 정보 저장 실패:", error);
       alert(

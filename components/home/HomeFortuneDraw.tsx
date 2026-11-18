@@ -288,6 +288,8 @@ export default function HomeFortuneDraw() {
         }
       }
 
+      if (process.env.NEXT_PUBLIC_UNLOG_PAGES === "true") return;
+
       try {
         const response = await fetch("/api/auth/me", { cache: "no-store" });
         if (!response.ok) return;

@@ -14,9 +14,13 @@ export type StoneWalletBalanceStatus =
 
 export function useStoneWalletBalance(refreshKey?: string) {
   const [walletBalance, setWalletBalance] = useState<number | null>(null);
-  const [status, setStatus] = useState<StoneWalletBalanceStatus>("loading");
+  const [status, setStatus] = useState<StoneWalletBalanceStatus>(
+    process.env.NEXT_PUBLIC_UNLOG_PAGES === "true" ? "unauthenticated" : "loading"
+  );
 
   useEffect(() => {
+    if (process.env.NEXT_PUBLIC_UNLOG_PAGES === "true") return;
+
     const controller = new AbortController();
 
     async function loadWalletBalance() {
