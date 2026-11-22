@@ -15,6 +15,18 @@ export const TEN_GOD_NAMES = [
 ] as const;
 export type TenGodName = (typeof TEN_GOD_NAMES)[number];
 
+export type SajuReadingSource = {
+  readonly dayStem: string;
+  readonly fiveElements: Readonly<Record<FiveElementKo, number>>;
+  readonly tenGods: {
+    readonly year: { readonly stem: string; readonly branch: string };
+    readonly month: { readonly stem: string; readonly branch: string };
+    readonly day: { readonly stem: string; readonly branch: string };
+    readonly hour: { readonly stem: string; readonly branch: string };
+  };
+  readonly birthTimeUnknown: boolean;
+};
+
 export type TenGodOccurrence = {
   readonly name: TenGodName;
   readonly position: "year" | "month" | "day" | "hour";
