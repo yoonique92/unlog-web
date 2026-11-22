@@ -3,9 +3,16 @@ import { describe, expect, it } from "vitest";
 import { validateFortuneVoice } from "../fortuneCopy/voiceValidation";
 import { buildDayMasterCopy } from "./buildDayMasterCopy";
 import { buildFiveElementsCopy } from "./buildFiveElementsCopy";
-import { selectDominantTenGods } from "./buildSajuReadingFacts";
+import {
+  buildSajuReadingFacts,
+  selectDominantTenGods,
+} from "./buildSajuReadingFacts";
 import { buildTenGodCopies } from "./buildTenGodCopy";
-import type { SajuReadingFacts, TenGodOccurrence } from "./types";
+import type {
+  SajuReadingFacts,
+  SajuReadingSource,
+  TenGodOccurrence,
+} from "./types";
 
 const baseFacts: SajuReadingFacts = {
   dayMaster: {
@@ -44,6 +51,19 @@ const baseFacts: SajuReadingFacts = {
   birthTimeUnknown: false,
 };
 
+const source = (overrides: Partial<SajuReadingSource> = {}): SajuReadingSource => ({
+  dayStem: "己",
+  fiveElements: { 목: 1, 화: 1, 토: 3, 금: 1, 수: 1 },
+  tenGods: {
+    year: { stem: "식신", branch: "비견" },
+    month: { stem: "정관", branch: "정관" },
+    day: { stem: "(일간)", branch: "정인" },
+    hour: { stem: "편재", branch: "상관" },
+  },
+  birthTimeUnknown: false,
+  ...overrides,
+});
+
 describe("saju reading v1", () => {
   it("builds deterministic day-master copy", () => {
     const first = buildDayMasterCopy(baseFacts);
@@ -52,6 +72,23 @@ describe("saju reading v1", () => {
     expect(first).toEqual(second);
     expect(first.headline).toContain("기토");
     expect(first.paragraphs).toHaveLength(2);
+  });
+
+  it("supports all ten day masters with the shared voice guardrails", () => {
+    const stems = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"] as const;
+
+    for (const stem of stems) {
+      const facts = buildSajuReadingFacts(source({ dayStem: stem }));
+      const copy = buildDayMasterCopy(facts);
+      const issues = validateFortuneVoice(copy.paragraphs.join("\n"), {
+        contentKind: "myeongri_explanation",
+        checkParagraphTone: true,
+        checkAbstractLanguage: true,
+      });
+
+      expect(copy.headline.length).toBeGreaterThan(0);
+      expect(issues).toEqual([]);
+    }
   });
 
   it("explains a dominant five element without treating it as good or bad", () => {
@@ -85,6 +122,28 @@ describe("saju reading v1", () => {
       "정관",
       "정인",
     ]);
+  });
+
+  it("does not invent hour ten gods when the birth time is unknown", () => {
+    const facts = buildSajuReadingFacts(
+      source({
+        birthTimeUnknown: true,
+        tenGods: {
+          year: { stem: "식신", branch: "비견" },
+          month: { stem: "정관", branch: "정관" },
+          day: { stem: "(일간)", branch: "정인" },
+          hour: { stem: "편재", branch: "상관" },
+        },
+      }),
+    );
+
+    expect(facts.tenGods.occurrences).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ position: "hour" }),
+      ]),
+    );
+    expect(facts.tenGods.counts.편재).toBe(0);
+    expect(facts.tenGods.counts.상관).toBe(0);
   });
 
   it("never invents ten gods that are not present in dominant facts", () => {
