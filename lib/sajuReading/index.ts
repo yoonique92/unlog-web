@@ -1,14 +1,11 @@
-import type { getSaju } from "../saju";
 import { buildDayMasterCopy } from "./buildDayMasterCopy";
 import { buildFiveElementsCopy } from "./buildFiveElementsCopy";
 import { buildSajuReadingFacts } from "./buildSajuReadingFacts";
 import { buildTenGodCopies } from "./buildTenGodCopy";
-import type { SajuReadingDocument } from "./types";
-
-type CanonicalSajuResult = ReturnType<typeof getSaju>;
+import type { SajuReadingDocument, SajuReadingSource } from "./types";
 
 export function buildSajuReading(
-  saju: CanonicalSajuResult,
+  saju: SajuReadingSource,
 ): SajuReadingDocument {
   const facts = buildSajuReadingFacts(saju);
   return {
