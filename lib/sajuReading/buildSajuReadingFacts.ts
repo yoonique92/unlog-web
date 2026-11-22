@@ -1,15 +1,13 @@
-import type { getSaju } from "../saju";
 import {
   FIVE_ELEMENTS_KO,
   TEN_GOD_NAMES,
   type DominantTenGodFact,
   type FiveElementKo,
   type SajuReadingFacts,
+  type SajuReadingSource,
   type TenGodName,
   type TenGodOccurrence,
 } from "./types";
-
-type CanonicalSajuResult = ReturnType<typeof getSaju>;
 
 const DAY_MASTER_META: Record<
   string,
@@ -47,6 +45,11 @@ function emptyTenGodCounts(): Record<TenGodName, number> {
   ) as Record<TenGodName, number>;
 }
 
+/**
+ * v1에서는 새로운 중요도 점수를 만들지 않는다.
+ * 먼저 실제 출현 횟수로 정렬하고, 동률일 때만 일지 → 월주 → 시주 → 년주
+ * 순으로 먼저 관찰되는 십성을 앞에 둔다.
+ */
 export function selectDominantTenGods(
   occurrences: readonly TenGodOccurrence[],
 ): DominantTenGodFact[] {
@@ -80,7 +83,7 @@ export function selectDominantTenGods(
 }
 
 export function buildSajuReadingFacts(
-  saju: CanonicalSajuResult,
+  saju: SajuReadingSource,
 ): SajuReadingFacts {
   const dayMaster = DAY_MASTER_META[saju.dayStem];
   if (!dayMaster) {
@@ -91,6 +94,8 @@ export function buildSajuReadingFacts(
     FIVE_ELEMENTS_KO.map((element) => [element, saju.fiveElements[element] ?? 0]),
   ) as Record<FiveElementKo, number>;
 
+  // 일간 자체는 십성 개수에서 제외한다. 일지는 포함하고, 시간이 없는 원국은
+  // 시주의 십성을 새로 만들지 않는다.
   const slotValues = [
     { position: "day", target: "branch", value: saju.tenGods.day.branch },
     { position: "month", target: "stem", value: saju.tenGods.month.stem },
