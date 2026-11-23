@@ -5,10 +5,8 @@ import { join, resolve } from "node:path";
 const root = process.cwd();
 const stage = await mkdtemp(join(root, ".pages-build-"));
 const basePath = "/unlog-web";
-const routes = ["compatibility", "onboarding/saju", "result", "saju", "saju/detail", "today"];
+const routes = ["charge", "friends", "friends/relationship", "compatibility", "onboarding/saju", "result", "saju", "saju/detail", "today"];
 const unavailable = {
-  charge: ["로그 상점", "운석 충전과 사용에는 계정 연결이 필요해요."],
-  friends: ["로그 프렌즈", "친구를 초대하고 정원을 꾸미려면 계정 연결이 필요해요."],
   "saju/yearly": ["신년운세", "신년운세를 보려면 계정에 내 사주를 연결해야 해요."],
 };
 

@@ -34,6 +34,7 @@ const paymentMethods: PaymentMethod[] = [
 const formatPrice = (price: number) => `${price.toLocaleString("ko-KR")}원`;
 
 export default function ChargePage() {
+  const isPagesPreview = process.env.NEXT_PUBLIC_UNLOG_PAGES === "true";
   const { walletBalance, status: walletStatus } = useStoneWalletBalance();
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
@@ -46,7 +47,7 @@ export default function ChargePage() {
 
   const handlePayment = () => {
     if (!canPay || !selectedProduct) return;
-    alert("결제 기능은 준비 중이에요.");
+    alert(isPagesPreview ? "지금은 로그 상점 미리보기예요. 운석 충전은 정식 서비스에서 이용할 수 있어요." : "결제 기능은 준비 중이에요.");
   };
 
   return (
@@ -57,6 +58,9 @@ export default function ChargePage() {
           <h1 className="text-[22px] font-extrabold tracking-[-0.03em] text-[#241B63]">
             로그 상점
           </h1>
+          {isPagesPreview && (
+            <p className="mt-2 text-[13px] text-[#77717E]">상품과 결제수단을 둘러보세요. 실제 충전은 준비 중이에요.</p>
+          )}
 
           <section
             aria-label="현재 보유 운석"
@@ -71,7 +75,7 @@ export default function ChargePage() {
                 aria-live="polite"
                 className="mt-1 text-[20px] font-extrabold text-[#302863]"
               >
-                {walletStatus === "loading"
+                {isPagesPreview ? "계정 연결 후 확인" : walletStatus === "loading"
                   ? "불러오는 중"
                   : walletStatus === "error"
                     ? "—"

@@ -246,10 +246,11 @@ const fiveElementSampleFriends: FriendCharacter[] = [
 
 const isDevelopmentEnvironment =
   process.env.NODE_ENV === "development";
+const isPagesPreview = process.env.NEXT_PUBLIC_UNLOG_PAGES === "true";
 
 const developmentSampleFriends =
   getDevelopmentSampleFriends({
-    isDevelopment: isDevelopmentEnvironment,
+    isDevelopment: isDevelopmentEnvironment || isPagesPreview,
     sampleFriends: fiveElementSampleFriends,
   });
 
@@ -472,6 +473,7 @@ export default function FriendsWorld() {
 
   const loadInvitedFriends =
     async () => {
+      if (isPagesPreview) return;
       const developmentMockCount =
         typeof window === "undefined"
           ? null
@@ -808,6 +810,10 @@ export default function FriendsWorld() {
 
   const createInvite =
     async () => {
+      if (isPagesPreview) {
+        alert("친구 초대는 계정 연결 후 이용할 수 있어요. 지금은 예시 친구들과 정원을 둘러보세요.");
+        return;
+      }
       if (actualFriendCount >= MAX_STORED_FRIENDS) {
         alert(FRIEND_LIMIT_REACHED_MESSAGE);
         return;
@@ -1022,7 +1028,7 @@ export default function FriendsWorld() {
                   text-white
                 "
               >
-                나의 로그 프렌즈✨
+                {isPagesPreview ? "로그 프렌즈 미리보기✨" : "나의 로그 프렌즈✨"}
               </h1>
 
               <p
@@ -1035,7 +1041,7 @@ export default function FriendsWorld() {
                   text-white/90
                 "
               >
-                나와 이어진 인연을 하나씩 기록해보세요
+                {isPagesPreview ? "예시 친구들을 눌러 정원을 둘러보세요" : "나와 이어진 인연을 하나씩 기록해보세요"}
               </p>
             </div>
 
